@@ -60,7 +60,9 @@ const HomeScreen = ({navigation}) => {
           <OverflowMenu
             style={{ marginHorizontal: 10 }}
             OverflowIcon={({ color }) => (
-              <MaterialIcons name="more-horiz" size={30} color={backgroundApp} />
+              <MaterialIcons name={Platform.OS === 'ios' ? "more-horiz" : "more-vert"}
+                size={30} color={backgroundApp} />
+
             )}
           >
             <HiddenItem title="Logout" onPress={handleLogoutPress} />

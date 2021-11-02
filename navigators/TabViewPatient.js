@@ -22,9 +22,9 @@ const {logoColor, backgroundApp} = Colors;
 
 const Tab = createBottomTabNavigator();
 
-const TabViewPatient = ({navigation}) => {
+const TabViewPatient = ({ route, navigation }) => {
   const handleEditModePress = () => {
-    navigation.navigate('TabEditPatient');
+    navigation.navigate('TabEditPatient', route.params);
   };
 
   // Make a option menu on the upper right for Logout
@@ -35,7 +35,9 @@ const TabViewPatient = ({navigation}) => {
           <OverflowMenu
             style={{ marginHorizontal: 10 }}
             OverflowIcon={({ color }) => (
-              <MaterialIcons name="more-horiz" size={30} color={backgroundApp} />
+              <MaterialIcons name={Platform.OS === 'ios' ? "more-horiz" : "more-vert"}
+                size={30} color={backgroundApp} />
+
             )}
           >
             <HiddenItem title="Edit Mode" onPress={handleEditModePress} />

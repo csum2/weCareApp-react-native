@@ -5,7 +5,7 @@
  *
  */
 import styled from 'styled-components';
-import {View, Text, TextInput, TouchableOpacity} from 'react-native';
+import {View, Text, ScrollView, TextInput, TouchableOpacity} from 'react-native';
 //import Constants from 'expo-constants'
 
 //const StatusBarHeight = Constants.statusBarHeight
@@ -166,7 +166,7 @@ export const Line = styled.View`
    height: 1px;
    width: 100%;
    background-color: ${blackColor};
-   margin-vertical: 10px;
+   margin-vertical: 20px;
 `;
 
 export const ExtraView = styled.View`
@@ -227,6 +227,7 @@ export const ButtonTextOne = styled.Text`
        padding: 5px;
    `}
 `;
+
 export const ButtonTextTwo = styled.Text`
    color: ${logoColor};
    font-weight: bold;
@@ -235,4 +236,24 @@ export const ButtonTextTwo = styled.Text`
      ${(props) => props.google == true && `
        padding: 5px;
    `}
+`;
+
+export const StyledScrollView = styled.ScrollView`
+  flex: 1;
+  width: 95%;
+  margin-left: 30px;
+`;
+
+export const NameTitle1 = styled.Text`
+   color: ${logoColor};
+   text-align: center;
+   margin-bottom: 8px;
+   font-size: 18px;
+`;
+
+export const NameTitle2 = styled.Text`
+   color: ${blackColor};
+   text-align: center;
+   margin-vertical: 1px;
+   font-size: 16px;
 `;

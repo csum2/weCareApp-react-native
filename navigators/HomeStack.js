@@ -20,7 +20,7 @@ import LoginScreen from './../Screens/LoginScreen';
 import HomeScreen from './../Screens/HomeScreen';
 import ListPatientScreen from './../Screens/ListPatientScreen';
 import AddPatientBasicScreen from './../Screens/AddPatientBasicScreen';
-import AddPatientMedicalScreen from './../Screens/AddPatientMedicalScreen';
+import AddEditPatientMedicalScreen from './../Screens/AddEditPatientMedicalScreen';
 import SearchPatientAddMedicalScreen from './../Screens/SearchPatientAddMedicalScreen';
 
 // Import styles
@@ -72,8 +72,8 @@ const HomeStack = () => {
             options={{ title: 'Add Medical Data...' }}
           />
           <Stack.Screen
-            name="AddPatientMedicalScreen"
-            component={AddPatientMedicalScreen}
+            name="AddEditPatientMedicalScreen"
+            component={AddEditPatientMedicalScreen}
             options={{ title: 'Add Medical Data' }}
           />
           <Stack.Screen

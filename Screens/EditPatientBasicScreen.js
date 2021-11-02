@@ -12,7 +12,10 @@ import {
    SubTitle,
 } from './../components/styles';
 
-const EditPatientBasicScreen = ({navigation}) => {
+const EditPatientBasicScreen = ({ route, navigation }) => {
+  /* TODO: hardcode json data for testing */
+  console.log("EditPatientBasicScreen, route.params.first_name:" + route.params.first_name)
+
   return (
     <StyledContainer>
       <InnerContainer>
