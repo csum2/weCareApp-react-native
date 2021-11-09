@@ -46,7 +46,7 @@ const HomeScreen = ({navigation}) => {
     navigation.navigate('ListPatientScreen', {critical: true});
   };
   const handleAddPatientPress = () => {
-    navigation.navigate('AddPatientBasicScreen');
+    navigation.navigate('AddEditPatientBasicScreen', {mode: "add"});
   };
   const handleAddMedicalPress = () => {
     navigation.navigate('SearchPatientAddMedicalScreen');

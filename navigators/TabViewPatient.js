@@ -22,9 +22,27 @@ const {logoColor, backgroundApp} = Colors;
 
 const Tab = createBottomTabNavigator();
 
+// focusedTab is an indicator set by the tab screens to idectify the current active tab
+const focusedTab = {active: ''};
+export const FocusedTabContext = React.createContext(null);
+
 const TabViewPatient = ({ route, navigation }) => {
+
   const handleEditModePress = () => {
-    navigation.navigate('TabEditPatient', route.params);
+    //navigation.navigate('TabEditPatient', route.params);
+    // TODO: trigger the cooresponding function of basic profile or medical data
+    console.log("TabViewPatient, handleEditModePress, focusedTab:" + focusedTab.active );
+    if (focusedTab.active == "PatientMedicalScreen") {
+      // trigger the save function in the Patient Medical Screen
+      console.log("TabViewPatient, edit mode submit medical data" );
+      route.params.mode = "edit";
+      navigation.navigate('AddEditPatientMedicalScreen', route.params);
+    } else {
+      // trigger the save function in the Patient Basic Screen
+      console.log("TabViewPatient, edit mode submit basic info" );
+      route.params.mode = "edit";
+      navigation.navigate('AddEditPatientBasicScreen', route.params);
+    }
   };
 
   // Make a option menu on the upper right for Logout
@@ -48,6 +66,7 @@ const TabViewPatient = ({ route, navigation }) => {
   }, [navigation]);
 
   return (
+    <FocusedTabContext.Provider value={focusedTab}>
     <Tab.Navigator initialRouteName="ViewPatientBasicScreen"
     screenOptions={{
       tabBarActiveTintColor: `${logoColor}`,
@@ -56,6 +75,7 @@ const TabViewPatient = ({ route, navigation }) => {
       <Tab.Screen
         name="ViewPatientBasicScreen"
         component={ViewPatientBasicScreen}
+        initialParams={route.params}
          options={{
           headerShown: false,
           tabBarLabel: 'Basic Information',
@@ -67,6 +87,7 @@ const TabViewPatient = ({ route, navigation }) => {
       <Tab.Screen
         name="ViewPatientMedicalScreen"
         component={ViewPatientMedicalScreen}
+        initialParams={route.params}
          options={{
           headerShown: false,
           tabBarLabel: 'Medical Information',
@@ -76,6 +97,7 @@ const TabViewPatient = ({ route, navigation }) => {
         }}
       />
     </Tab.Navigator>
+    </FocusedTabContext.Provider>
   );
 };
 
