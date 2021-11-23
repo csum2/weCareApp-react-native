@@ -30,7 +30,7 @@ import {
 
 const DATA = [
   {
-    id: '61855d5f8758d01752d42a27',
+    id: '618b29c767a1a70b7dd59ec8',
     name: 'Danniel Summer',
   },
   {
@@ -73,11 +73,11 @@ const ListPatientScreen = ({navigation}) => {
     /* TODO: hardcode json data for testing */
   }
 
-  const patientJson = '{"_id":"61855d5f8758d01752d42a27", "first_name":"Danniel", "last_name":"Summer", "date_of_birth":"1971-12-25", "biological_sex":"Male",' +
+  const patientJson = '{"_id":"618b29c767a1a70b7dd59ec8", "first_name":"Danniel", "last_name":"Summer", "date_of_birth":"1971-12-25", "biological_sex":"Male",' +
     '"email": "summer@abcmail.com", "contact_phone": "905-889-1430", "residential_address": "123 main street, markham", "emergency_contact": "Mary Summer", "emergency_phone": "416-123-4567", "relationship": "daugther",' +
     '"medicaldata":[' +
-    '{"_id": "6185600e16a051184807031b", "sortkey":"202109201355", "measuring_date":"2021-09-20", "measuring_time":"13:55", "systolic_pressure":"110", "diastolic_pressure":"68", "respiratory_rate":"50", "oxygen_level":"98", "heartbeat_rate":"75"},' +
-    '{"_id": "6185600e16a051184807031c", "sortkey":"202109211400", "measuring_date":"2021-09-21", "measuring_time":"14:00", "systolic_pressure":"100", "diastolic_pressure":"69", "respiratory_rate":"55", "oxygen_level":"99", "heartbeat_rate":"78"} ' +
+//    '{"_id": "6185600e16a051184807031b", "sortkey":"202109201355", "measuring_date":"2021-09-20", "measuring_time":"13:55", "systolic_pressure":"110", "diastolic_pressure":"68", "respiratory_rate":"50", "oxygen_level":"98", "heartbeat_rate":"75"},' +
+//    '{"_id": "6185600e16a051184807031c", "sortkey":"202109211400", "measuring_date":"2021-09-21", "measuring_time":"14:00", "systolic_pressure":"100", "diastolic_pressure":"69", "respiratory_rate":"55", "oxygen_level":"99", "heartbeat_rate":"78"} ' +
     ']}';
 
   var patientObj = JSON.parse(patientJson);

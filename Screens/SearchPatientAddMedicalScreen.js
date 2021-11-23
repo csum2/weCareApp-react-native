@@ -4,8 +4,9 @@
  * Group 13
  *
  */
-import React from 'react';
+import React, {useState} from 'react';
 import {
+  Alert,
   SafeAreaView,
   View,
   FlatList,
@@ -14,6 +15,7 @@ import {
   StatusBar,
   Image,
 } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   StyledContainer,
   InnerContainer,
@@ -21,6 +23,8 @@ import {
   SubTitle,
   StyledProfileButtonOne,
   ButtonTextOne,
+  RightIcon3,
+  Colors,
   StyledFlatList,
   StyledFlatListView,
   StyledFlatListText,
@@ -28,12 +32,8 @@ import {
   StyledSearchInput,
 } from './../components/styles';
 
-const DATA = [
-  {
-    id: '61855d5f8758d01752d42a27',
-    name: 'Danniel Summer',
-  },
-];
+const {logoColor, buttonColors, blackColor, backgroundApp} = Colors;
+
 const Item = ({name, onPress}) => (
   <StyledFlatListView onPress={onPress}>
     <StyledFlatListText>{name}</StyledFlatListText>
@@ -41,44 +41,66 @@ const Item = ({name, onPress}) => (
 );
 
 const SearchPatientAddMedicalScreen = ({route, navigation}) => {
-  {
-    /* This screen should read from the DB on the patient  */
-  }
-  const renderItem = ({item}) => (
-    <Item
-      name={item.name}
-      onPress={() => navigation.navigate('AddEditPatientMedicalScreen', patientObj)}
-    />
-  );
-  {
-    /* and medical json objects and pass to the next screen */
-  }
-  {
-    /* TODO: hardcode json data for testing */
-  }
 
-  const patientJson = '{"_id":"61855d5f8758d01752d42a27", "first_name":"Danniel", "last_name":"Summer", "date_of_birth":"1971-12-25", "biological_sex":"Male",' +
-    '"email": "summer@abcmail.com", "contact_phone": "905-889-1430", "residential_address": "123 main street, markham", "emergency_contact": "Mary Summer", "emergency_phone": "416-123-4567", "relationship": "daugther",' +
-    '"medicaldata":[' +
-    '{"_id": "6185600e16a051184807031b", "sortkey":"202109201355", "measuring_date":"2021-09-20", "measuring_time":"13:55", "systolic_pressure":"110", "diastolic_pressure":"68", "respiratory_rate":"50", "oxygen_level":"98", "heartbeat_rate":"75"},' +
-    '{"_id": "6185600e16a051184807031c", "sortkey":"202109211400", "measuring_date":"2021-09-21", "measuring_time":"14:00", "systolic_pressure":"100", "diastolic_pressure":"69", "respiratory_rate":"55", "oxygen_level":"99", "heartbeat_rate":"78"} ' +
-    ']}';
+  const [patentData, setPatientData] = useState(null);
+  const [searchName, setSearchName] = useState('');
 
-  var patientObj = JSON.parse(patientJson);
-  patientObj.mode = "add";
-  console.log('ListPatientScreen, patientObj._id:' + patientObj._id);
-  console.log('ListPatientScreen, patientObj.first_name:' + patientObj.first_name);
+  const fetchData = async () => {
+    const restOptions = {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    };
+    //Android emulator use URI = 'http://10.0.2.2:5000/patientnames/' + searchName
+    //IOS simulator use URI = 'http://127.0.0.1:5000/patientnames/' + searchName
+    const URI = 'http://127.0.0.1:5000/patientnames/' + searchName
+    console.log("SearchPatientAddMedicalScreen, URI: " + URI);
+
+    await fetch(URI, restOptions)
+      .then((response) => response.json())
+      .then((data) => {
+        setPatientData(data);
+      })
+      .catch((response) => {
+        // error saveing the data
+        console.log("SearchPatientAddMedicalScreen, fetchData failed!!!!!!");
+        console.log("response: " + response);
+        Alert.alert(
+          "Error Reading Patient Data",
+          response.toString(),
+          [
+            { text: "OK"}
+          ]
+        );
+      });
+  };
+
+  const renderItem = ({item}) => {
+    //console.log("SearchPatientAddMedicalScreen, renderItem item=" + item);
+    item.mode = "add"
+    return (
+      <Item
+        name={item.first_name + " " + item.last_name}
+        onPress={() => navigation.navigate('AddEditPatientMedicalScreen', item)}
+      />
+    );
+  };
 
   return (
     <StyledContainer>
       <InnerContainer>
         <SubTitle></SubTitle>
         <PageTitle>Search a patient</PageTitle>
-          <StyledSearchInput placeholder="Search your patient name" />
+          <StyledSearchInput placeholder="Search your patient name"
+            onChangeText={text => setSearchName(text)}
+            defaultValue={searchName}
+          />
+          <RightIcon3 onPress={()=>fetchData()}>
+              <Ionicons name="md-search" size={32} color={buttonColors} />
+          </RightIcon3>
           <StyledFlatList
-            data={DATA}
+            data={patentData}
             renderItem={renderItem}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item._id}
           />
       </InnerContainer>
     </StyledContainer>

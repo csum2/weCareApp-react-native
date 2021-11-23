@@ -152,6 +152,13 @@ export const RightIcon2 = styled.TouchableOpacity`
   z-index: 1;
 `;
 
+export const RightIcon3 = styled.TouchableOpacity`
+  right: 18px;
+  top: 84px;
+  position: absolute;
+  z-index: 1;
+`;
+
 export const StyledButton = styled.TouchableOpacity`
   padding: 15px;
   background-color: ${logoColor};

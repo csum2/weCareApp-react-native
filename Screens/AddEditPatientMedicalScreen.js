@@ -103,7 +103,9 @@ const AddEditPatientMedicalScreen = ({ route, navigation}) => {
       headers: { 'Content-Type': 'application/json' },
       body: httpBody
     };
-    const URI = 'http://127.0.0.1:5000/patients/' + _idPatient
+    //Android emulator use URI = 'http://10.0.2.2:5000/patients/' + _idPatient
+    //IOS simulator use URI = 'http://127.0.0.1:5000/patients/' + _idPatient
+    const URI = 'http://10.0.2.2:5000/patients/' + _idPatient
     console.log("AddEditPatientMedicalScreen, URI: " + URI);
 
     await fetch(URI, restOptions)
