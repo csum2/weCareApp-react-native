@@ -45,6 +45,10 @@ import {getLatestData, getISODate, getTime24hoursFormat} from './../components/u
 
 const {backgroundApp, logoColor, buttonColors, accentColors, accentBackground, blackColor, errorColor} = Colors;
 
+//Android emulator use HOST = 'http://10.0.2.2:5000'
+//IOS simulator use HOST = 'http://127.0.0.1:5000'
+const HOST = 'http://127.0.0.1:5000'
+
 const AddEditPatientMedicalScreen = ({ route, navigation}) => {
   const [pickerOpen, setPickerOpen] = useState(false);
 
@@ -78,37 +82,44 @@ const AddEditPatientMedicalScreen = ({ route, navigation}) => {
 
   const saveMedicalData = async (inputVales) => {
     //console.log("AddEditPatientMedicalScreen, saveMedicalData");
-    var newMedicaldata = [];
+    var newMedicaldata = {};
+    var uri = '';
+    var restOptions = {};
     if (mode == "add") {
       // insert a new record to the database
       //console.log("AddEditPatientMedicalScreen, add mode input: " + JSON.stringify(inputVales));
+      console.log("AddEditPatientMedicalScreen, add mode");
       newMedicaldata = buildNewDataFromAdd(medicaldata, inputVales);
+      uri = HOST + '/patients/' + _idPatient + '/medical'
       //console.log("AddEditPatientMedicalScreen, add mode new medicaldata: " + JSON.stringify(newMedicaldata));
+      const httpBody = JSON.stringify(newMedicaldata);
+      console.log("AddEditPatientMedicalScreen, httpBody: " + httpBody);
+      // the method value below must be in uppercase
+      restOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: httpBody
+      };
     } else {
       // update a record in the database
       //console.log("AddEditPatientMedicalScreen, edit mode input: " + JSON.stringify(inputVales));
       console.log("AddEditPatientMedicalScreen, edit mode data _id: " + JSON.stringify(initVal._id));
       newMedicaldata = buildNewDataFromEdit(medicaldata, inputVales, initVal._id);
+      uri = HOST + '/patients/' + _idPatient + '/medical/' + initVal._id
       //console.log("AddEditPatientMedicalScreen, edit mode new medicaldata: " + JSON.stringify(newMedicaldata));
+      const httpBody = JSON.stringify(newMedicaldata);
+      console.log("AddEditPatientMedicalScreen, httpBody: " + httpBody);
+      // the method value below must be in uppercase
+      restOptions = {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: httpBody
+      };
     }
-    const httpBody = '{"medicaldata":' + JSON.stringify(newMedicaldata) + '}';
-    console.log("AddEditPatientMedicalScreen, httpBody: " + httpBody);
 
-    // the method value below must be in uppercase
-    //body: JSON.stringify(httpBody)
-    //body: JSON.stringify({"email": "abcnew@abcmail.com"})
-    //body: JSON.stringify({"medicaldata":[{"sortkey":"202111062317","measuring_date":"2021-11-06","measuring_time":"23:17","systolic_pressure":"99","diastolic_pressure":"88","respiratory_rate":"77","oxygen_level":"66","heartbeat_rate":"55"}]})
-    const restOptions = {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: httpBody
-    };
-    //Android emulator use URI = 'http://10.0.2.2:5000/patients/' + _idPatient
-    //IOS simulator use URI = 'http://127.0.0.1:5000/patients/' + _idPatient
-    const URI = 'http://10.0.2.2:5000/patients/' + _idPatient
-    console.log("AddEditPatientMedicalScreen, URI: " + URI);
+    console.log("AddEditPatientMedicalScreen, uri: " + uri);
 
-    await fetch(URI, restOptions)
+    await fetch(uri, restOptions)
       .then((response) => response.json())
       .then((data) => {
         Alert.alert(
@@ -364,7 +375,7 @@ function buildInitValues(buildMode, originalMedicalData) {
   }
 }
 
-function buildNewDataFromAdd(oldJsonArray, inData, oldID) {
+function buildNewDataFromAdd(oldJsonArray, inData) {
   // a new entry is built and added to the existing JSON array
   var newEntry = new Object();
   newEntry.sortkey = (inData.measuringDate + inData.measuringTime).replace(/-/g, "").replace(/:/g, "");
@@ -375,24 +386,22 @@ function buildNewDataFromAdd(oldJsonArray, inData, oldID) {
   newEntry.respiratory_rate = inData.respiratoryRate;
   newEntry.oxygen_level = inData.oxygenLevel;
   newEntry.heartbeat_rate = inData.heartbeatRate;
-  return oldJsonArray.concat(newEntry);
+  return newEntry;
 }
 
 function buildNewDataFromEdit(oldJsonArray, inData, oldId) {
-  // a new entry is built and replace the existing element in the JSON array
-  oldJsonArray.forEach((item, i) => {
-    if (item._id == oldId) {
-      oldJsonArray[i].sortkey = (inData.measuringDate + inData.measuringTime).replace(/-/g, "").replace(/:/g, "");
-      oldJsonArray[i].measuring_date = inData.measuringDate;
-      oldJsonArray[i].measuring_time = inData.measuringTime;
-      oldJsonArray[i].systolic_pressure = inData.systolicPressure;
-      oldJsonArray[i].diastolic_pressure = inData.diastolicPressure;
-      oldJsonArray[i].respiratory_rate = inData.respiratoryRate;
-      oldJsonArray[i].oxygen_level = inData.oxygenLevel;
-      oldJsonArray[i].heartbeat_rate = inData.heartbeatRate;
-    }
-  });
-  return oldJsonArray;
+  var newEntry = new Object();
+  newEntry.sortkey = (inData.measuringDate + inData.measuringTime).replace(/-/g, "").replace(/:/g, "");
+  newEntry.measuring_date = inData.measuringDate;
+  newEntry.measuring_time = inData.measuringTime;
+  newEntry.systolic_pressure = inData.systolicPressure;
+  newEntry.diastolic_pressure = inData.diastolicPressure;
+  newEntry.respiratory_rate = inData.respiratoryRate;
+  newEntry.oxygen_level = inData.oxygenLevel;
+  newEntry.heartbeat_rate = inData.heartbeatRate;
+  // keep the old Id for the edited record
+  newEntry._id = oldId
+  return newEntry;
 }
 
 export default AddEditPatientMedicalScreen;
