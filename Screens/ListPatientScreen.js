@@ -6,6 +6,7 @@
  */
 import React, {useState} from 'react';
 import {
+  Alert,
   SafeAreaView,
   View,
   FlatList,
@@ -30,7 +31,7 @@ import {
   StyledSquaredButton,
   StyledSearchInput,
 } from './../components/styles';
-
+import {getLatestData} from './../components/utilities';
 const {logoColor, buttonColors, blackColor, backgroundApp} = Colors;
 
 const Item = ({name, onPress}) => (
@@ -39,9 +40,11 @@ const Item = ({name, onPress}) => (
   </StyledFlatListView>
 );
 
-const ListPatientScreen = ({navigation}) => {
-  const [patentData, setPatientData] = useState(null);
+const ListPatientScreen = ({route, navigation}) => {
+  const [patientData, setPatientData] = useState(null);
   const [searchName, setSearchName] = useState('');
+  const { critical } = route.params;
+  console.log("ListPatientScreen, critical: " + critical);
 
   const fetchData = async () => {
     const restOptions = {
@@ -50,17 +53,22 @@ const ListPatientScreen = ({navigation}) => {
     };
     //Android emulator use URI = 'http://10.0.2.2:5000/patientnames/' + searchName
     //IOS simulator use URI = 'http://127.0.0.1:5000/patientnames/' + searchName
-    const URI = 'http://127.0.0.1:5000/patientnames/' + searchName
-    console.log("SearchPatientAddMedicalScreen, URI: " + URI);
+    const URI = 'https://rest-wecare.herokuapp.com/patientnames/' + searchName
+    console.log("ListPatientScreen, URI: " + URI);
 
     await fetch(URI, restOptions)
       .then((response) => response.json())
       .then((data) => {
-        setPatientData(data);
+        if (critical) {
+          console.log("ListPatientScreen, fetchData, trigger filterCriticalPatients");
+          filterCriticalPatients(data);
+        } else {
+          setPatientData(data);
+        }
       })
       .catch((response) => {
         // error saveing the data
-        console.log("SearchPatientAddMedicalScreen, fetchData failed!!!!!!");
+        console.log("ListPatientScreen, fetchData failed!!!!!!");
         console.log("response: " + response);
         Alert.alert(
           "Error Reading Patient Data",
@@ -72,6 +80,32 @@ const ListPatientScreen = ({navigation}) => {
       });
   };
 
+  const filterCriticalPatients = (inPatient) => {
+    console.log("ListPatientScreen, filterCriticalPatients running");
+    if (inPatient !== null) {
+      criticalPatients = inPatient.filter(function(item){
+        const recentData = getLatestData(item.medicaldata, "sortkey");
+        console.log("ListPatientScreen, filterCriticalPatients, recentData:" + JSON.stringify(recentData));
+        if (recentData === undefined)
+          return false;
+        else if (recentData.systolic_pressure > 200 || recentData.systolic_pressure < 100)
+          return true;
+        else if (recentData.diastolic_pressure > 150 || recentData.diastolic_pressure < 60)
+          return true;
+        else if (recentData.respiratory_rate > 16 || recentData.respiratory_rate < 12)
+          return true;
+        else if (recentData.oxygen_level < 95)
+          return true;
+        else if (recentData.heartbeat_rate > 100 || recentData.heartbeat_rate < 60)
+          return true;
+        else {
+          return false;
+        }
+      });
+      setPatientData(criticalPatients);
+    }
+  };
+
   const renderItem = ({item}) => (
     <Item
       name={item.first_name + " " + item.last_name}
@@ -79,8 +113,22 @@ const ListPatientScreen = ({navigation}) => {
     />
   );
 
+  // Change the screen title according to the critical flag set by the parent screen
+  React.useLayoutEffect(() => {
+    if (critical) {
+      navigation.setOptions({ title: 'Critical Patients' });
+    }
+  }, [navigation]);
+
   React.useEffect(() => {
-    fetchData();
+      console.log("ListPatientScreen, useEffect running");
+      fetchData();
+      // force re-fetch the data after navigation goback to this screen
+      const willFocusSubscription = navigation.addListener('focus', () => {
+        fetchData();
+    });
+
+    return willFocusSubscription;
   }, []);
 
   return (
@@ -93,12 +141,14 @@ const ListPatientScreen = ({navigation}) => {
           <RightIcon4 onPress={()=>fetchData()}>
               <Ionicons name="md-search" size={32} color={buttonColors} />
           </RightIcon4>
-        <StyledSquaredButton>
-          <ButtonTextOne>Only Critical patients</ButtonTextOne>
-        </StyledSquaredButton>
-        { patentData && (
+        { !critical && (
+          <StyledSquaredButton>
+            <ButtonTextOne onPress={()=>filterCriticalPatients(patientData)}>Only Critical patients</ButtonTextOne>
+          </StyledSquaredButton>
+        )}
+        { patientData && (
           <StyledFlatList
-            data={patentData.sort((a, b) => a.first_name.localeCompare(b.first_name))}
+            data={patientData.sort((a, b) => a.first_name.localeCompare(b.first_name))}
             renderItem={renderItem}
             keyExtractor={item => item._id}
           />

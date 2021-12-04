@@ -47,7 +47,7 @@ const {backgroundApp, logoColor, buttonColors, accentColors, accentBackground, b
 
 //Android emulator use HOST = 'http://10.0.2.2:5000'
 //IOS simulator use HOST = 'http://127.0.0.1:5000'
-const HOST = 'http://127.0.0.1:5000'
+const HOST = 'https://rest-wecare.herokuapp.com'
 
 const AddEditPatientMedicalScreen = ({ route, navigation}) => {
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -360,7 +360,7 @@ function buildInitValues(buildMode, originalMedicalData) {
     return returnVal;
   } else {
     // all inital values are coming from the params for edit mode
-    const recentData = getLatestData(originalMedicalData, "sortkey")
+    const recentData = getLatestData(originalMedicalData, "sortkey");
     const returnVal = {
       _id: recentData._id,
       measuringDate: recentData.measuring_date,

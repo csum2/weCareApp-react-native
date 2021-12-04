@@ -42,7 +42,7 @@ const Item = ({name, onPress}) => (
 
 const SearchPatientAddMedicalScreen = ({route, navigation}) => {
 
-  const [patentData, setPatientData] = useState(null);
+  const [patientData, setPatientData] = useState(null);
   const [searchName, setSearchName] = useState('');
 
   const fetchData = async () => {
@@ -52,8 +52,8 @@ const SearchPatientAddMedicalScreen = ({route, navigation}) => {
     };
     //Android emulator use URI = 'http://10.0.2.2:5000/patientnames/' + searchName
     //IOS simulator use URI = 'http://127.0.0.1:5000/patientnames/' + searchName
-    const URI = 'http://127.0.0.1:5000/patientnames/' + searchName
-    console.log("SearchPatientAddMedicalScreen, URI: " + URI);
+    const URI = 'https://rest-wecare.herokuapp.com/patientnames/' + searchName
+    //console.log("SearchPatientAddMedicalScreen, URI: " + URI);
 
     await fetch(URI, restOptions)
       .then((response) => response.json())
@@ -97,11 +97,13 @@ const SearchPatientAddMedicalScreen = ({route, navigation}) => {
           <RightIcon3 onPress={()=>fetchData()}>
               <Ionicons name="md-search" size={32} color={buttonColors} />
           </RightIcon3>
-          <StyledFlatList
-            data={patentData}
-            renderItem={renderItem}
-            keyExtractor={item => item._id}
-          />
+          { patientData && (
+            <StyledFlatList
+              data={patientData.sort((a, b) => a.first_name.localeCompare(b.first_name))}
+              renderItem={renderItem}
+              keyExtractor={item => item._id}
+            />
+          )}
       </InnerContainer>
     </StyledContainer>
   );

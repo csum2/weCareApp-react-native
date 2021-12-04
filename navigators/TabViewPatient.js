@@ -5,6 +5,7 @@
  *
  */
 import React from 'react';
+import {Alert} from "react-native";
 import {NavigationContainer} from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -18,7 +19,13 @@ import ViewPatientMedicalScreen from './../Screens/ViewPatientMedicalScreen';
 
 // Import styles
 import {Colors} from './../components/styles';
+import {getLatestData} from './../components/utilities';
+
 const {logoColor, backgroundApp} = Colors;
+
+//Android emulator use HOST = 'http://10.0.2.2:5000'
+//IOS simulator use HOST = 'http://127.0.0.1:5000'
+const HOST = 'https://rest-wecare.herokuapp.com'
 
 const Tab = createBottomTabNavigator();
 
@@ -30,7 +37,6 @@ const TabViewPatient = ({ route, navigation }) => {
 
   const handleEditModePress = () => {
     //navigation.navigate('TabEditPatient', route.params);
-    // TODO: trigger the cooresponding function of basic profile or medical data
     console.log("TabViewPatient, handleEditModePress, focusedTab:" + focusedTab.active );
     if (focusedTab.active == "PatientMedicalScreen") {
       // trigger the save function in the Patient Medical Screen
@@ -42,6 +48,23 @@ const TabViewPatient = ({ route, navigation }) => {
       console.log("TabViewPatient, edit mode submit basic info" );
       route.params.mode = "edit";
       navigation.navigate('AddEditPatientBasicScreen', route.params);
+    }
+  };
+
+  const handleDeletePress = () => {
+    console.log("TabViewPatient, handleDeletePress, focusedTab:" + focusedTab.active );
+    if (focusedTab.active == "PatientMedicalScreen") {
+      console.log("TabViewPatient, delete medical data" );
+      if (route.params.medicaldata !== undefined && route.params.medicaldata.length) {
+        deleteMedical(route.params, navigation);
+      } else {
+        Alert.alert(
+          "No Medical Data", "nothing to delete!",
+          [ { text: "OK" } ]
+        );
+      }
+    } else {
+      console.log("TabViewPatient, delete basic info" );
     }
   };
 
@@ -59,6 +82,7 @@ const TabViewPatient = ({ route, navigation }) => {
             )}
           >
             <HiddenItem title="Edit Mode" onPress={handleEditModePress} />
+            <HiddenItem title="Delete Record" onPress={handleDeletePress} />
           </OverflowMenu>
         </MaterialHeaderButtons>
       ),
@@ -100,5 +124,41 @@ const TabViewPatient = ({ route, navigation }) => {
     </FocusedTabContext.Provider>
   );
 };
+
+async function deleteMedical(paramPatient, navigation) {
+  const recentData = getLatestData(paramPatient.medicaldata, "sortkey");
+  console.log("TabViewPatient, deleteMedical, recentData:" + JSON.stringify(recentData));
+  uri = HOST + '/patients/' + paramPatient._id + '/medical/' + recentData._id
+  // the method value below must be in uppercase
+  restOptions = {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: ''
+  };
+  console.log("TabViewPatient, uri: " + uri);
+  await fetch(uri, restOptions)
+    .then((response) => response.json())
+    .then((data) => {
+      Alert.alert(
+        "Medical Data",
+        "is deleted successfully!",
+        [
+          { text: "OK", onPress: () => navigation.goBack() }
+        ]
+      );
+    })
+    .catch((response) => {
+      // error saveing the data
+      console.log("TabViewPatient, deleteMedical failed!!!!!!");
+      console.log("response: " + response);
+      Alert.alert(
+        "Error Deleting Medical Data",
+        response.toString(),
+        [
+          { text: "OK"}
+        ]
+      );
+    });
+}
 
 export default TabViewPatient;

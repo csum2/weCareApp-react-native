@@ -48,7 +48,7 @@ const {
   errorColor,
 } = Colors;
 
-const HOST = 'http://127.0.0.1:5000';
+const HOST = 'https://rest-wecare.herokuapp.com';
 
 //array for gender
 const gender = [
