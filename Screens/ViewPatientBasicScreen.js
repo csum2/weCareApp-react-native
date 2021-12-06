@@ -19,35 +19,48 @@ import {
 } from './../components/styles';
 import { FocusedTabContext } from './../navigators/TabViewPatient';
 
-const ViewPatientBasicScreen = ({navigation}) => {
+const ViewPatientBasicScreen = ({route, navigation}) => {
   // set focusedTab of the parent tab navigators
    const focusedTab = useContext(FocusedTabContext);
+
    if (focusedTab !== null) {
      focusedTab.active = "PatientBasicScreen";
    }
 
+   //Getting the patient information
+   const patientName = route.params.first_name+" "+route.params.last_name;
+   const patientDOB = route.params.date_of_birth;
+   const patientSex = route.params.biological_sex;
+   const patientEmail = route.params.email;
+   const patientContact = route.params.contact_phone;
+   const patientAddress = route.params.residential_address;
+   const patientEmergencyContact = route.params.emergency_contact;
+   const patientEmergencyPhone = route.params.emergency_phone;
+   const patientRelationship = route.params.relationship;
+
+
    return (
     <StyledContainer>
       <InnerContainer>
-        <StyledPatientName>Danniel Summer</StyledPatientName>
+        <StyledPatientName>{patientName}</StyledPatientName>
         <StyledSubTitles>Date of birth</StyledSubTitles>
-        <StyledTexts>1971 - 12 - 25</StyledTexts>
+        <StyledTexts>{patientDOB}</StyledTexts>
         <StyledSubTitles>Biological Sex</StyledSubTitles>
-        <StyledTexts>Male</StyledTexts>
+        <StyledTexts>{patientSex}</StyledTexts>
         <StyledLines source={require('../Images/line.png')} />
         <StyledSubTitles>Email</StyledSubTitles>
-        <StyledTexts>dsummer@gmail.com</StyledTexts>
+        <StyledTexts>{patientEmail}</StyledTexts>
         <StyledSubTitles>Contact phone</StyledSubTitles>
-        <StyledTexts>514 123 4567</StyledTexts>
+        <StyledTexts>{patientContact}</StyledTexts>
         <StyledSubTitles>Residential address</StyledSubTitles>
-        <StyledTexts>123 Prime Ave, Montreal, Canada</StyledTexts>
+        <StyledTexts>{patientAddress}</StyledTexts>
         <StyledLines source={require('../Images/line.png')} />
         <StyledSubTitles>Emercency contact</StyledSubTitles>
-        <StyledTexts>GI Joe</StyledTexts>
+        <StyledTexts>{patientEmergencyContact}</StyledTexts>
         <StyledSubTitles>Emergency contact</StyledSubTitles>
-        <StyledTexts>514 111 2222</StyledTexts>
+        <StyledTexts>{patientEmergencyPhone}</StyledTexts>
         <StyledSubTitles>Relationship</StyledSubTitles>
-        <StyledTexts>Cousin</StyledTexts>
+        <StyledTexts>{patientRelationship}</StyledTexts>
       </InnerContainer>
     </StyledContainer>
   );
