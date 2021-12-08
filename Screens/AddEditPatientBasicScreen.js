@@ -37,6 +37,7 @@ import RadioForm, {
 } from 'react-native-simple-radio-button';
 import {ScrollView} from 'react-native-gesture-handler';
 import {getLatestData} from './../components/utilities';
+import { values } from 'lodash-es';
 
 const {
   backgroundApp,
@@ -52,21 +53,17 @@ const HOST = 'https://rest-wecare.herokuapp.com';
 
 //array for gender
 const gender = [
-  {label: 'Male', value: 1},
-  {label: 'Female', value: 2},
+  {label: 'male', value: 1},
+  {label: 'female', value: 2},
 ];
 
 const AddEditPatientBasicScreen = ({route, navigation}) => {
   var {mode} = route.params;
   const _id = route.params._id;
-  const patientdata = []; //route.params;
+  var patientdata = route.params;
   console.log(
     'AddEditPatientBasicScreen, patientdata:' + JSON.stringify(patientdata),
   );
-
-  if (_id === undefined || !_id.length) {
-    mode = 'add';
-  }
 
   console.log('AddEditPatientBasicScreen, route.params.mode:' + mode);
 
@@ -104,26 +101,53 @@ const AddEditPatientBasicScreen = ({route, navigation}) => {
         headers: {'Content-Type': 'application/json'},
         body: httpBody,
       };
+    } else {
+      // update a record in the database
+      //console.log("AddEditPatientBasicScreen, edit mode input: " + JSON.stringify(inputVales));
+      console.log("AddEditPatientBasicScreen, edit mode data _id: " + JSON.stringify(_id));
+      newPatientData = buildNewPatientFromEdit(patientdata, inputValues, _id);
+      uri = HOST + '/patients/' + _id
+      //console.log("AddEditPatientBasicScreen, edit mode new patientdata: " + JSON.stringify(newPatientData));
+      const httpBody = JSON.stringify(newPatientData);
+      console.log("AddEditPatientBasicScreen, httpBody: " + httpBody);
+      // the method value below must be in uppercase
+      restOptions = {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: httpBody
+      };
     }
 
-    console.log('AddEditPatientBasicScreen, uri: ' + uri);
+    console.log("AddEditPatientBasicScreen, uri: " + uri);
 
     await fetch(uri, restOptions)
-      .then(response => response.json())
-      .then(data => {
-        Alert.alert('Patien Basic data', 'saved successfully!', [
-          {text: 'Ok', onPress: () => navigation.goBack()},
-        ]);
+      .then((response) => response.json())
+      .then((data) => {
+        Alert.alert(
+          "Patient Data",
+          "saved successfully!",
+          [
+            { text: "OK", onPress: () => navigation.goBack() }
+          ]
+        );
       })
-      .catch(response => {
-        //catching error
-        console.log('AddEditPatientBasicScreen, add new patient failed :(');
-        console.log('response: ' + response);
-        Alert.alert('Error Saving new User', response.toString(), [
-          {text: 'Ok'},
-        ]);
+      .catch((response) => {
+        // error saveing the data
+        console.log("AddEditPatientBasicScreen, savePatientData failed!!!!!!");
+        console.log("response: " + response);
+        Alert.alert(
+          "Error Saving Patient Data",
+          response.toString(),
+          [
+            { text: "OK"}
+          ]
+        );
       });
-  };
+
+    };
+
+
+
 
   // Make a option menu on the upper right for saving
   React.useLayoutEffect(() => {
@@ -164,6 +188,7 @@ const AddEditPatientBasicScreen = ({route, navigation}) => {
               first_name: initVal.first_name,
               last_name: initVal.last_name,
               date_of_birth: initVal.date_of_birth,
+              biological_sex: initVal.biological_sex,
               email: initVal.email,
               contact_phone: initVal.contact_phone,
               residential_address: initVal.residential_address,
@@ -382,13 +407,30 @@ function buildNewPatientFromAdd(oldJsonArray, inData) {
   newEntry.first_name = inData.first_name;
   newEntry.last_name = inData.last_name;
   newEntry.date_of_birth = inData.date_of_birth;
-  newEntry.biological_sex = 'male'; //inData.gender;
+  newEntry.biological_sex = inData.biological_sex;
   newEntry.email = inData.email;
   newEntry.contact_phone = inData.contact_phone;
   newEntry.residential_address = inData.residential_address;
   newEntry.emergency_contact = inData.emergency_contact;
   newEntry.emergency_phone = inData.emergency_phone;
   newEntry.relationship = inData.relationship;
+  return newEntry;
+}
+
+function buildNewPatientFromEdit(oldJsonArray, inData, oldId) {
+  var newEntry = new Object();
+  newEntry.first_name = inData.first_name;
+  newEntry.last_name = inData.last_name;
+  newEntry.date_of_birth = inData.date_of_birth;
+  newEntry.biological_sex = inData.biological_sex;
+  newEntry.email = inData.email;
+  newEntry.contact_phone = inData.contact_phone;
+  newEntry.residential_address = inData.residential_address;
+  newEntry.emergency_contact = inData.emergency_contact;
+  newEntry.emergency_phone = inData.emergency_phone;
+  newEntry.relationship = inData.relationship;
+  // keep the old Id for the edited record
+  newEntry._id = oldId
   return newEntry;
 }
 
